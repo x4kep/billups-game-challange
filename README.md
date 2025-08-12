@@ -37,7 +37,7 @@ dotnet run
 
 ```bash
 cd client
-npm start
+npm run dev
 
 ```
 

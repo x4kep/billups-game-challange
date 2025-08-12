@@ -1,14 +1,18 @@
 @echo off
+setlocal
 
-REM Start backend server in new window
-start cmd /k "cd server && dotnet run"
+REM Start backend in a new window
+start "" cmd /k "cd /d %~dp0server && dotnet run"
 
-REM Wait a few seconds for backend to start
+REM Give backend a moment
 timeout /t 1 /nobreak >nul
 
-REM Open Swagger UI in default browser
-start http://localhost:5209/swagger/index.html
+REM Open Swagger
+start "" http://localhost:5209/swagger/index.html
 
-REM Start frontend in current window
-cd client
-npm run dev
+REM Start Vite dev server in a new window
+start "" cmd /k "cd /d %~dp0client && npm run dev"
+
+REM Optional: wait a bit then open the app
+timeout /t 2 /nobreak >nul
+start "" http://localhost:5173/
