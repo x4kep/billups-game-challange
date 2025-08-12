@@ -11,4 +11,4 @@ start http://localhost:5209/swagger/index.html
 
 REM Start frontend in current window
 cd client
-npm start
+npm run dev
