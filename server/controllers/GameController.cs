@@ -5,7 +5,7 @@ using server.Services;
 namespace server.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api")]
 public class GameController : ControllerBase
 {
     private readonly IHttpClientFactory _http;
