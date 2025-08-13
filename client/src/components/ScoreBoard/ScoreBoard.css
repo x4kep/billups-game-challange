@@ -1,0 +1,81 @@
+.score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    user-select: none;
+    border-radius: 15px;
+}
+
+.score-player {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #ccc;
+    flex-shrink: 0;
+}
+
+.score-player img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.score-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #ccc;
+    flex-shrink: 0;
+}
+
+.score-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.score-vs {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #444;
+}
+
+.score-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.score-vs-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #444;
+    min-width: 100px;
+    max-width: 100px;
+}
+
+.score-outcome {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.score-outcome.win {
+    color: #16a34a;
+}
+
+.score-outcome.lose {
+    color: #dc2626;
+}
+
+.score-outcome.tie {
+    color: #eab308;
+}

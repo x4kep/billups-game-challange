@@ -7,16 +7,30 @@ import {
   playRound,
   resetScores,
 } from "./services/api/api";
+import ScoreTable from "./components/ScoreTable/ScoreTable";
+import ChoiceGrid from "./components/Choices/ChoiceGrid";
+import ScoreBoard from "./components/ScoreBoard/ScoreBoard";
 
 function App() {
   const [choices, setChoices] = useState<Choice[]>([]);
   const [scores, setScores] = useState<Score[]>([]);
 
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [user, setUser] = useState("");
+  // const [user, setUser] = useState("");
   const [lastResult, setLastResult] = useState<string>("");
+
+  // NEW: keep the last round picks
+  const [lastPlayerChoice, setLastPlayerChoice] = useState<number | null>(null);
+  const [lastComputerChoice, setLastComputerChoice] = useState<number | null>(
+    null
+  );
+
+  // helpers
+  const nameOf = (id: number) =>
+    choices.find((c) => c.id === id)?.name ?? `#${id}`;
 
   useEffect(() => {
     Promise.all([getChoices(), getScores()])
@@ -30,19 +44,28 @@ function App() {
 
   async function onPlay(choiceId: number) {
     setError(null);
+    setBusy(true);
     try {
-      const r = await playRound(choiceId, user || undefined);
-      const nameOf = (id: number) =>
-        choices.find((c) => c.id === id)?.name ?? `#${id}`;
+      const r = await playRound(choiceId, undefined);
+      setLastPlayerChoice(r.player);
+      setLastComputerChoice(r.computer);
+
       setLastResult(
         `${r.results.toUpperCase()} (you: ${nameOf(r.player)}, cpu: ${nameOf(
           r.computer
         )})`
       );
+
       const s = await getScores();
       setScores(s);
-    } catch (e: any) {
-      setError(e.message ?? "Failed to play");
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("Failed to play");
+      }
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -50,45 +73,28 @@ function App() {
     <>
       <div className="container">
         <h1>Rock, Paper, Scissors, Lizard, Spock</h1>
+
+        {/* SCORE AREA */}
+        <ScoreBoard
+          lastResult={lastResult}
+          lastPlayerChoice={lastPlayerChoice}
+          lastComputerChoice={lastComputerChoice}
+          className="mt-6"
+        />
+
         {loading && <p>Loading…</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {/* CHOICES */}
-        <div
-          className="card"
-          style={{
-            display: "flex",
-            gap: 8,
-            flexWrap: "wrap",
-            justifyContent: "center",
-          }}
-        >
-          {choices.map((c) => (
-            <button key={c.id} onClick={() => onPlay(c.id)}>
-              {c.name}
-            </button>
-          ))}
-        </div>
-
-        {/* LAST RESULT */}
-        {lastResult && <p>Last result: {lastResult}</p>}
+        <ChoiceGrid
+          choices={choices}
+          loading={loading}
+          busy={busy}
+          onPlay={(id) => onPlay(id)}
+        />
 
         {/* SCORES */}
-        <ul>
-          {scores.map((s, idx) => (
-            <li key={s.ts + idx}>
-              {new Date(s.ts).toLocaleTimeString()} —{" "}
-              {s.user ? s.user + " — " : ""}
-              you:{" "}
-              {choices.find((c) => c.id === s.player)?.name ??
-                `#${s.player}`}{" "}
-              vs cpu:{" "}
-              {choices.find((c) => c.id === s.computer)?.name ??
-                `#${s.computer}`}{" "}
-              → {s.results}
-            </li>
-          ))}
-        </ul>
+        <ScoreTable scores={scores} />
 
         {/* RESET SCORE */}
         <button
@@ -96,14 +102,13 @@ function App() {
             await resetScores();
             const s = await getScores();
             setLastResult("");
+            setLastPlayerChoice(null);
+            setLastComputerChoice(null);
             setScores(s);
           }}
         >
           Reset
         </button>
-
-        {/* RULES */}
-        
       </div>
     </>
   );

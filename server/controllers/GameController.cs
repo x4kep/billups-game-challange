@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
+
 using server.Services;
 
 namespace server.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/[controller]")]
 public class GameController : ControllerBase
 {
     private readonly IHttpClientFactory _http;

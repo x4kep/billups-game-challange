@@ -12,7 +12,7 @@ export async function playRound(
   player: number,
   user?: string
 ): Promise<PlayResult> {
-  const res = await fetch(`${BASE_URL}/play`, {
+  const res = await fetch(`${BASE_URL}/game/play`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ player, user }),
@@ -28,7 +28,7 @@ export async function getScores(): Promise<Score[]> {
 }
 
 export async function resetScores(): Promise<{ ok: true }> {
-  const res = await fetch(`${BASE_URL}/scores/reset`, { method: 'POST' })
-  if (!res.ok) throw new Error('Failed to reset scores')
-  return res.json()
+  const res = await fetch(`${BASE_URL}/scores/reset`, { method: "POST" });
+  if (!res.ok) throw new Error("Failed to reset scores");
+  return res.json();
 }
