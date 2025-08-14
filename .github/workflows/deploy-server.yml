@@ -39,7 +39,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.ECR_REGION }}
 
-      - name: Who am I? (sanity)
+      - name: Who am I?
         run: aws sts get-caller-identity
 
       - name: Login to Amazon ECR

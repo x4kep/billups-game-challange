@@ -27,7 +27,6 @@ const ScoreBoard = memo(function ScoreBoard({
   className = "",
   nameOf = defaultNameOf,
   iconSrc,
-  vsLabel = "VS",
 }: Props) {
   const buildIconSrc = iconSrc ?? ((n: ChoiceName) => `/${n}_icon.png`);
 
@@ -65,9 +64,9 @@ const ScoreBoard = memo(function ScoreBoard({
       </div>
 
       <div className="score-vs-wrapper">
-        <div className="score-vs">{vsLabel}</div>
+        <div className="score-vs">VS</div>
         {outcome && (
-          <div className={`score-outcome ${outcome}`}>
+          <div className={`score-outcome ${outcome}`} data-testid="result-text">
             {outcome.toUpperCase()}
           </div>
         )}

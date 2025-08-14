@@ -89,3 +89,13 @@ This workflow is triggered when code is pushed to the **main** branch in the **s
 **Notes:**
 
 - In production, prefer manual deployment approval after tests pass.
+
+### Testing
+
+- Run Playwright E2E tests to verify app features and UI interactions across browsers.
+
+```bash
+cd client
+npm run test:e2e
+npx playwright test --debug
+```

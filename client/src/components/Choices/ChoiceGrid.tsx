@@ -35,7 +35,7 @@ const ChoiceGrid = memo(function ChoiceGrid({
             className="choice-btn"
             onClick={() => onPlay(c.id)}
             disabled={isDisabled}
-            aria-label={`Choose ${c.name}`}
+            aria-label={`${c.name}`}
           >
             {busy ? (
               <img src="/loading_icon.png" alt="Loading…" className="spin" />
