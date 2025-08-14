@@ -29,7 +29,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # If you prefer OIDC, swap this step for a role-to-assume version later.
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -37,7 +36,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Who am I?
+      - name: Who am I? (sanity)
         run: aws sts get-caller-identity
 
       - name: Login to Amazon ECR
@@ -61,5 +60,36 @@ jobs:
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache
           cache-to: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache,mode=max
 
-      - name: Output pushed image digest
-        run: echo "Digest ${{ steps.build.outputs.digest }}"
+      # ---- Artifacts: Build record + deployment metadata ----
+      - name: Export Docker Build record (.dockerbuild)
+        # Buildx >= 0.13 supports history export; don't fail if unavailable
+        run: |
+          docker buildx version
+          docker buildx history export -o client-build.dockerbuild || echo "Skipping build record export (not supported on this runner)"
+
+      - name: Create deploy metadata
+        run: |
+          BUILD_TIME="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          cat > client-deploy-info.json <<EOF
+          {
+            "image": "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest",
+            "digest": "${{ steps.build.outputs.digest }}",
+            "commit": "${{ github.sha }}",
+            "repo": "${{ github.repository }}",
+            "branch": "${{ github.ref_name }}",
+            "buildTimeUTC": "${BUILD_TIME}",
+            "region": "${{ env.AWS_REGION }}",
+            "viteApiBase": "${{ env.VITE_API_BASE }}"
+          }
+          EOF
+          cat client-deploy-info.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-deploy-${{ github.sha }}
+          path: |
+            client-deploy-info.json
+            client-build.dockerbuild
+          if-no-files-found: warn
+          retention-days: 30
