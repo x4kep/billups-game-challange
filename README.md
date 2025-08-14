@@ -66,7 +66,7 @@ This workflow is triggered when code is pushed to the **main** branch in the **c
 
 **Purpose:**
 
-- Builds the client Docker image.
+- Builds the client Docker image (Dockerfile is provided in the client project).
 - Pushes the image to AWS ECR.
 - Triggers AWS App Runner deployment (automatic update is enabled in this demo).
 
@@ -82,7 +82,7 @@ This workflow is triggered when code is pushed to the **main** branch in the **s
 
 **Purpose:**
 
-- Builds the backend (API) Docker image.
+- Builds the backend (API) Docker image (Dockerfile is provided in the server project).
 - Pushes the image to AWS ECR.
 - Triggers AWS App Runner deployment (automatic update is enabled in this demo).
 
