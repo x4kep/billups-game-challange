@@ -25,7 +25,7 @@ public class GameService : IGameService
 
     public int MapRandomToChoiceId(int n)
     {
-        // 1..20 -> 1, 21..40 -> 2, 41..60 -> 3, 61..80 -> 4, 81..100 -> 5
+        // 1..20 -> 1, 21..40 -> 2, 41..60 -> 3, 61..80 -> 4, 81..100 -> 5 
         if (n < 1) n = 1; 
         if (n > 100) n = 100;
         
