@@ -1,4 +1,4 @@
-# Rock-Paper-Scissors-Lizard-Spock API and UI
+# Rock-Paper-Scissors-Lizard-Spock SERVER and CLIENT
 
 ## Overview
 
