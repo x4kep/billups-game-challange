@@ -1,0 +1,96 @@
+name: Deploy API to ECR
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "server/**"
+      - ".github/workflows/deploy-api.yml"
+
+concurrency:
+  group: api-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  # ECR (your API image repo)
+  ECR_REGION: eu-north-1
+  ECR_REGISTRY: 790277131841.dkr.ecr.eu-north-1.amazonaws.com
+  ECR_REPOSITORY: myapp
+
+  # App Runner (your running API service)
+  APP_RUNNER_REGION: us-east-1
+  APP_RUNNER_SERVICE_ARN: arn:aws:apprunner:us-east-1:790277131841:service/billups-game-api/cf2113d8a0f6468bbb2c4641e988a34f
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (ECR region)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.ECR_REGION }}
+
+      - name: Who am I? (sanity)
+        run: aws sts get-caller-identity
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push API image
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache
+          cache-to: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache,mode=max
+
+      # Artifacts for traceability
+      - name: Export Docker Build record (.dockerbuild)
+        run: |
+          docker buildx version
+          docker buildx history export -o api-build.dockerbuild || echo "Skipping build record export"
+
+      - name: Create deploy metadata
+        run: |
+          BUILD_TIME="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          cat > api-deploy-info.json <<EOF
+          {
+            "image": "${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest",
+            "digest": "${{ steps.build.outputs.digest }}",
+            "commit": "${{ github.sha }}",
+            "repo": "${{ github.repository }}",
+            "branch": "${{ github.ref_name }}",
+            "buildTimeUTC": "${BUILD_TIME}",
+            "ecrRegion": "${{ env.ECR_REGION }}",
+            "appRunnerRegion": "${{ env.APP_RUNNER_REGION }}",
+            "serviceArn": "${{ env.APP_RUNNER_SERVICE_ARN }}"
+          }
+          EOF
+          cat api-deploy-info.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-deploy-${{ github.sha }}
+          path: |
+            api-deploy-info.json
+            api-build.dockerbuild
+          if-no-files-found: warn
+          retention-days: 30
