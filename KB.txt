@@ -1,0 +1,37 @@
+Knowladge base moust used scripts
+________________________________________
+
+Docker – Most Used Commands
+
+docker images              # List all images
+docker run <image>         # Run container from image
+docker build -t myapp:latest ./app doc
+
+aws ecr get-login-password --region eu-central-1 `
+>> | docker login --username AWS --password-stdin 790277131841.dkr.ecr.eu-central-1.amazonaws.com
+
+docker build -t react-ui:latest .
+docker run --rm -p 5173:8080 react-ui:latest
+docker push 790277131841.dkr.ecr.eu-central-1.amazonaws.com/billupsgame/ui:latest
+
+
+$API = "https://3q3wybpmda.us-east-1.awsapprunner.com/api"
+
+docker build --no-cache -t billups-ui:latest `
+  --build-arg VITE_API_BASE=$API .
+
+docker run --rm billups-ui:latest sh -lc "grep -R -F 'localhost:5209' /usr/share/nginx/html >/dev/null && echo 'Found localhost (bad)' || echo 'OK no localhost'"
+
+
+
+# 1. Login na ECR
+aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 790277131841.dkr.ecr.eu-central-1.amazonaws.com
+
+# 2. Build image (uz build arg ako ti treba production API)
+docker build --build-arg VITE_API_BASE="https://3q3wybpmda.us-east-1.awsapprunner.com/api" -t billups-ui:latest .
+
+# 3. Taguj za ECR repo: 
+docker tag billups-ui:latest 790277131841.dkr.ecr.eu-central-1.amazonaws.com/billupsgame/ui:latest
+
+# 4. Push na ECR
+docker push 790277131841.dkr.ecr.eu-central-1.amazonaws.com/billupsgame/ui:latest
