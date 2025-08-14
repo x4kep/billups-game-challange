@@ -1,4 +1,4 @@
-name: Deploy API to ECR
+name: Deploy server to ECR
 
 on:
   push:
