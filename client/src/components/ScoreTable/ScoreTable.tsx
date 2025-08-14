@@ -5,9 +5,13 @@ import { getGameChoiceName } from "../../enums/GameChoice";
 
 interface ScoreTableProps {
   scores: Score[];
+  className?: string;
 }
 
-export default function ScoreTable({ scores }: ScoreTableProps) {
+export default function ScoreTable({
+  scores,
+  className = "",
+}: ScoreTableProps) {
   const maxRows = 10;
 
   const [tableData, setTableData] = useState<(Score | null)[]>(
@@ -23,7 +27,7 @@ export default function ScoreTable({ scores }: ScoreTableProps) {
   }, [scores]);
 
   return (
-    <table className="score-table">
+    <table className={`score-table ${className}`}>
       <thead>
         <tr>
           <th>Time</th>

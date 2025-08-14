@@ -1,0 +1,18 @@
+.error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border: 1px solid var(--color-error-border);
+    background-color: var(--color-error-light);
+    color: var(--color-error-dark);
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 6px;
+    max-width: 400px;
+}
+
+.error-icon {
+    font-size: 18px;
+}

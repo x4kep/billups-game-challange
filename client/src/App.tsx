@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import "./styles/spacing.css";
+import "./styles/globals.css";
+import "./styles/variables.css";
 import "./App.css";
 import type { Choice, Score } from "./services/types/types";
 import {
@@ -10,6 +13,8 @@ import {
 import ScoreTable from "./components/ScoreTable/ScoreTable";
 import ChoiceGrid from "./components/Choices/ChoiceGrid";
 import ScoreBoard from "./components/ScoreBoard/ScoreBoard";
+import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 
 function App() {
   const [choices, setChoices] = useState<Choice[]>([]);
@@ -69,6 +74,15 @@ function App() {
     }
   }
 
+  const handleReset = async () => {
+    await resetScores();
+    const scores = await getScores();
+    setLastResult("");
+    setLastPlayerChoice(null);
+    setLastComputerChoice(null);
+    setScores(scores);
+  };
+
   return (
     <>
       <div className="container">
@@ -82,33 +96,28 @@ function App() {
           className="mt-6"
         />
 
-        {loading && <p>Loading…</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {loading && <LoadingSpinner />}
+        {error && (
+          <ErrorMessage
+            message="Something went wrong"
+            className="mt-4 mx-auto"
+          />
+        )}
 
         {/* CHOICES */}
         <ChoiceGrid
           choices={choices}
           loading={loading}
           busy={busy}
-          onPlay={(id) => onPlay(id)}
+          onPlay={onPlay}
+          className="mt-6 mb-4 mx-auto"
         />
 
         {/* SCORES */}
-        <ScoreTable scores={scores} />
+        <ScoreTable scores={scores} className="mb-4" />
 
         {/* RESET SCORE */}
-        <button
-          onClick={async () => {
-            await resetScores();
-            const s = await getScores();
-            setLastResult("");
-            setLastPlayerChoice(null);
-            setLastComputerChoice(null);
-            setScores(s);
-          }}
-        >
-          Reset
-        </button>
+        <button onClick={handleReset}>Reset</button>
       </div>
     </>
   );

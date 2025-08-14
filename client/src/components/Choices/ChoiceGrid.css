@@ -1,3 +1,10 @@
+.card {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .choice-btn {
     width: 64px;
     height: 64px;
