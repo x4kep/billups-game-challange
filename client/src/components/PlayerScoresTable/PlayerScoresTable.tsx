@@ -25,11 +25,13 @@ const PlayerScoresTable = memo(function PlayerScoresTable({
 
   return (
     <div className={`player-scores-table ${className}`}>
-      <h2 className="player-scores-table__title">Players recent games</h2>
+      <h2 className="player-scores-table__title">
+        Top 10 most recent games, grouped by user
+      </h2>
       <table className="player-scores-table__table">
         <thead className="player-scores-table__head">
           <tr>
-            <th className="player-scores-table__header">Name</th>
+            <th className="player-scores-table__header">User</th>
             <th className="player-scores-table__header">Wins</th>
             <th className="player-scores-table__header">Loses</th>
             <th className="player-scores-table__header">Ties</th>

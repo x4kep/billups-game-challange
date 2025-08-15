@@ -32,7 +32,7 @@ export default function ScoreTable({
         <tr className="score-table__row">
           <th className="score-table__header">Time</th>
           <th className="score-table__header">User</th>
-          <th className="score-table__header">You</th>
+          <th className="score-table__header">Human</th>
           <th className="score-table__header">CPU</th>
           <th className="score-table__header">Result</th>
         </tr>
