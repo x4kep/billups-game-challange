@@ -29,8 +29,16 @@
     font-weight: 600;
 }
 
+.player-scores-table__body tr:nth-child(odd) {
+    background-color: color-mix(in srgb, var(--color-gray-200) 20%, white);
+}
+
 .player-scores-table__body tr:nth-child(even) {
-    background-color: var(--color-gray-100);
+    background-color: var(--color-gray-200);
+}
+
+.player-scores-table__body tr:hover {
+    background-color: var(--color-gray-250, #e9e9e9);
 }
 
 .player-scores-table__cell--win {
@@ -55,5 +63,13 @@
         height: 30px;
         padding: 5px;
         font-size: 10px;
+    }
+
+    .player-scores-table__body tr:nth-child(odd) {
+        background-color: color-mix(in srgb, var(--color-gray-200) 30%, white);
+    }
+
+    .player-scores-table__body tr:nth-child(even) {
+        background-color: var(--color-gray-200);
     }
 }
