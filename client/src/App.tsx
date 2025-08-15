@@ -116,8 +116,8 @@ function App() {
 
   return (
     <>
-      <div className="container">
-        <h1>Rock, Paper, Scissors, Lizard, Spock</h1>
+      <div className="container mt-0">
+        <h1 className="app-header">Rock, Paper, Scissors, Lizard, Spock</h1>
 
         {/* PLAYER INFO */}
         <CurrentUser playerName={playerName} />
@@ -127,7 +127,7 @@ function App() {
           lastResult={lastResult}
           lastPlayerChoice={lastPlayerChoice}
           lastComputerChoice={lastComputerChoice}
-          className="mt-6"
+          className="mt-6 p-4"
         />
 
         {loading && <LoadingSpinner />}
