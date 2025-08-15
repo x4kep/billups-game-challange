@@ -28,10 +28,6 @@ jobs:
     defaults:
       run:
         working-directory: ./client
-    env:
-      # Passed into playwright.config.ts -> webServer.env
-      VITE_API_BASE: ${{ env.VITE_API_BASE }}
-      CI: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,9 +46,8 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: npx playwright test
+        run: npx playwright test  # or: npm run test:e2e
 
-      # Always upload reports for debugging (even on success is fine; change to if: failure() if you prefer)
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
