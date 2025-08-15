@@ -1,4 +1,5 @@
-.score {
+/* Block */
+.score-board {
     background-color: var(--color-score-bg);
     display: flex;
     align-items: center;
@@ -8,7 +9,16 @@
     border-radius: 15px;
 }
 
-.score-player {
+/* Elements */
+.score-board__column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.score-board__avatar {
     width: 160px;
     height: 160px;
     border-radius: 50%;
@@ -17,13 +27,13 @@
     flex-shrink: 0;
 }
 
-.score-player img {
+.score-board__avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.score-img {
+.score-board__choice {
     width: 80px;
     height: 80px;
     border-radius: 50%;
@@ -32,51 +42,41 @@
     flex-shrink: 0;
 }
 
-.score-img img {
+.score-board__choice img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.score-vs {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--color-gray-700);
-}
-
-.score-column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.score-vs-wrapper {
+.score-board__center {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 50px;
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--color-gray-700);
     min-width: 100px;
     max-width: 100px;
 }
 
-.score-outcome {
+.score-board__vs {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-gray-700);
+}
+
+.score-board__outcome {
     font-size: 2rem;
     font-weight: bold;
 }
 
-.score-outcome.win {
+/* Modifiers */
+.score-board__outcome--win {
     color: var(--color-success);
 }
 
-.score-outcome.lose {
+.score-board__outcome--lose {
     color: var(--color-error);
 }
 
-.score-outcome.tie {
+.score-board__outcome--tie {
     color: var(--color-warning);
 }

@@ -11,8 +11,7 @@ type Props = {
   loading?: boolean;
   busy?: boolean;
   onPlay: (choiceId: number) => void;
-  /** Optional wrapper classes for spacing, alignment, etc. */
-  className?: string;
+  className?: string; // extra layout classes from parent
 };
 
 const ChoiceGrid = memo(function ChoiceGrid({
@@ -25,22 +24,25 @@ const ChoiceGrid = memo(function ChoiceGrid({
   const isDisabled = loading || busy || choices.length === 0;
 
   return (
-    <div className={`card ${className}`} aria-busy={busy} aria-live="polite">
+    <div
+      className={`choice-grid ${isDisabled ? "choice-grid--disabled" : ""} ${className}`}
+      aria-busy={busy}
+      aria-live="polite"
+    >
       {choices.map((c) => {
         const icon = `/${c.name}_icon.png`;
-
         return (
           <button
             key={c.id}
-            className="choice-btn"
+            className="choice-grid__btn"
             onClick={() => onPlay(c.id)}
             disabled={isDisabled}
-            aria-label={`${c.name}`}
+            aria-label={c.name}
           >
             {busy ? (
-              <img src="/loading_icon.png" alt="Loading…" className="spin" />
+              <img src="/loading_icon.png" alt="Loading…" className="choice-grid__spinner" />
             ) : (
-              <img src={icon} title={c.name} alt={c.name} />
+              <img src={icon} title={c.name} alt={c.name} className="choice-grid__icon" />
             )}
           </button>
         );

@@ -28,25 +28,40 @@ export default function ScoreTable({
 
   return (
     <table className={`score-table ${className}`}>
-      <thead>
-        <tr>
-          <th>Time</th>
-          {/* <th>User</th> */}
-          <th>You</th>
-          <th>CPU</th>
-          <th>Result</th>
+      <thead className="score-table__head">
+        <tr className="score-table__row">
+          <th className="score-table__header">Time</th>
+          <th className="score-table__header">User</th>
+          <th className="score-table__header">You</th>
+          <th className="score-table__header">CPU</th>
+          <th className="score-table__header">Result</th>
         </tr>
       </thead>
-      <tbody>
-        {tableData.map((row, idx) => (
-          <tr key={idx}>
-            <td>{row ? new Date(row.ts).toLocaleTimeString() : ""}</td>
-            {/* <td>{row?.user ?? ""}</td> */}
-            <td>{row ? getGameChoiceName(row.player) : ""}</td>
-            <td>{row ? getGameChoiceName(row.computer) : ""}</td>
-            <td className={row?.results ?? ""}>{row?.results ?? ""}</td>
-          </tr>
-        ))}
+      <tbody className="score-table__body">
+        {tableData.map((row, idx) => {
+          const result = (row?.results || "").toLowerCase(); // win|lose|tie|""
+          const resultMod =
+            result === "win" || result === "lose" || result === "tie"
+              ? ` score-table__cell--${result}`
+              : "";
+          return (
+            <tr key={idx} className="score-table__row">
+              <td className="score-table__cell">
+                {row ? new Date(row.ts).toLocaleTimeString() : ""}
+              </td>
+              <td className="score-table__cell">{row?.user ?? ""}</td>
+              <td className="score-table__cell">
+                {row ? getGameChoiceName(row.player) : ""}
+              </td>
+              <td className="score-table__cell">
+                {row ? getGameChoiceName(row.computer) : ""}
+              </td>
+              <td className={`score-table__cell${resultMod}`}>
+                {row?.results ?? ""}
+              </td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

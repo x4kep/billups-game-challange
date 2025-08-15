@@ -1,4 +1,3 @@
-// src/components/ScoreSBOard.tsx
 import { memo, useMemo } from "react";
 import "./ScoreBoard.css";
 
@@ -27,6 +26,7 @@ const ScoreBoard = memo(function ScoreBoard({
   className = "",
   nameOf = defaultNameOf,
   iconSrc,
+  vsLabel = "VS",
 }: Props) {
   const buildIconSrc = iconSrc ?? ((n: ChoiceName) => `/${n}_icon.png`);
 
@@ -44,13 +44,13 @@ const ScoreBoard = memo(function ScoreBoard({
   const qIcon = `/question_icon.png`;
 
   return (
-    <div className={`score ${className}`}>
+    <div className={`score-board ${className}`}>
       {/* Left column (Human) */}
-      <div className="score-column">
-        <div className="score-player">
+      <div className="score-board__column">
+        <div className="score-board__avatar">
           <img src={humanIcon} alt="Human" title="Human" />
         </div>
-        <div className="score-img">
+        <div className="score-board__choice">
           {lastPlayerChoice ? (
             <img
               src={buildIconSrc(nameOf(lastPlayerChoice as ChoiceId))}
@@ -63,21 +63,25 @@ const ScoreBoard = memo(function ScoreBoard({
         </div>
       </div>
 
-      <div className="score-vs-wrapper">
-        <div className="score-vs">VS</div>
+      {/* Center (VS + outcome) */}
+      <div className="score-board__center">
+        <div className="score-board__vs">{vsLabel}</div>
         {outcome && (
-          <div className={`score-outcome ${outcome}`} data-testid="result-text">
+          <div
+            className={`score-board__outcome score-board__outcome--${outcome}`}
+            data-testid="result-text"
+          >
             {outcome.toUpperCase()}
           </div>
         )}
       </div>
 
       {/* Right column (Robot) */}
-      <div className="score-column">
-        <div className="score-player">
+      <div className="score-board__column">
+        <div className="score-board__avatar">
           <img src={robotIcon} alt="Robot" title="Robot" />
         </div>
-        <div className="score-img">
+        <div className="score-board__choice">
           {lastComputerChoice ? (
             <img
               src={buildIconSrc(nameOf(lastComputerChoice as ChoiceId))}

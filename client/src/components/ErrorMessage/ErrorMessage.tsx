@@ -11,8 +11,8 @@ export default function ErrorMessage({
 }: ErrorMessageProps) {
   return (
     <div className={`error-message ${className || ""}`}>
-      <span className="error-icon">⚠</span>
-      <span>{message}</span>
+      <span className="error-message__icon">⚠</span>
+      <span className="error-message__text">{message}</span>
     </div>
   );
 }
