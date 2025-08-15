@@ -1,6 +1,7 @@
 # ---------- Build stage ----------
 FROM node:20-alpine AS build
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm ci
 COPY . .
@@ -9,7 +10,12 @@ COPY . .
 ARG VITE_API_BASE
 ENV VITE_API_BASE=${VITE_API_BASE}
 
+# Guard: fail if missing; also create .env.production for Vite
+RUN test -n "$VITE_API_BASE" || (echo "ERROR: VITE_API_BASE is empty" && exit 1)
+RUN printf "VITE_API_BASE=%s\n" "$VITE_API_BASE" > .env.production
+
 # Show what we are building with, then build in production mode
+ENV NODE_ENV=production
 RUN echo "VITE_API_BASE=${VITE_API_BASE}" && npm run build -- --mode production
 
 # ---------- Serve stage ----------

@@ -19,12 +19,11 @@ env:
   AWS_REGION: eu-central-1
   ECR_REGISTRY: 790277131841.dkr.ecr.eu-central-1.amazonaws.com
   ECR_REPOSITORY: billupsgame/ui
-  VITE_API_BASE: https://3q3wybpmda.us-east-1.awsapprunner.com/api
+  VITE_API_BASE: "https://3q3wybpmda.us-east-1.awsapprunner.com/api"
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,6 +34,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Mask env
+        run: echo "::add-mask::${{ env.VITE_API_BASE }}"
 
       - name: Who am I?
         run: aws sts get-caller-identity
@@ -60,12 +62,10 @@ jobs:
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache
           cache-to: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache,mode=max
 
-      # ---- Artifacts: Build record + deployment metadata ----
       - name: Export Docker Build record (.dockerbuild)
-        # Buildx >= 0.13 supports history export; don't fail if unavailable
         run: |
           docker buildx version
-          docker buildx history export -o client-build.dockerbuild || echo "Skipping build record export (not supported on this runner)"
+          docker buildx history export -o client-build.dockerbuild || echo "Skipping build record export"
 
       - name: Create deploy metadata
         run: |
