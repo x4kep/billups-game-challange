@@ -9,14 +9,48 @@ This project is a full-stack implementation of the "Rock-Paper-Scissors-Lizard-S
 
 ## Features
 
-- Provides REST API endpoints (**CORS enabled for public testing**) to:
+- Provides REST API endpoints (CORS enabled for public testing) to:
 
-  - Get the list of choices: [GET /api/Choices](https://3q3wybpmda.us-east-1.awsapprunner.com/api/Choices)
-  - Get a random choice: [GET /api/Choices/random](https://3q3wybpmda.us-east-1.awsapprunner.com/api/Choices/random)
-  - Play a round against the computer: [POST /api/Game/play](https://3q3wybpmda.us-east-1.awsapprunner.com/api/Game/play)
-  - Check API health: [GET /api/Health](https://3q3wybpmda.us-east-1.awsapprunner.com/api/Health)
-  - Get the current scores: [GET /api/Scores](https://3q3wybpmda.us-east-1.awsapprunner.com/api/Scores)
-  - Reset all scores: [POST /api/Scores/reset](https://3q3wybpmda.us-east-1.awsapprunner.com/api/Scores/reset)
+  - Create a guest player:
+
+    - POST /api/players/guest
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/players/guest
+
+  - Get player scores (leaderboard):
+
+    - GET /api/players/scores
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/players/scores
+
+  - Get the list of choices:
+
+    - GET /api/choices
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/choices
+
+  - Get a random choice:
+
+    - GET /api/choices/random
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/choices/random
+
+  - Play a round against the computer:
+
+    - POST /api/game/play
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/game/play
+
+  - Get the current scores:
+
+    - GET /api/scores
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/scores
+
+  - Reset all scores:
+
+    - POST /api/scores/reset
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/scores/reset
+
+  - Check API health:
+    - GET /api/health
+    - https://3q3wybpmda.us-east-1.awsapprunner.com/api/health
+
+**Auth header:** most endpoints require `X-Player-Token: <token>` returned by `POST /api/players/guest`.
 
 - Computer’s choice is determined using the provided external random number API.
 - Swagger UI available for API exploration in Development mode.

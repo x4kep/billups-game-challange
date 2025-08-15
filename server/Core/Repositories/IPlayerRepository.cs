@@ -8,5 +8,4 @@ public interface IPlayerRepository
     Player? GetByToken(Guid token);
     Player? GetById(int id);
     IEnumerable<Player> GetAll();
-    bool Rename(int id, string newName);
 }

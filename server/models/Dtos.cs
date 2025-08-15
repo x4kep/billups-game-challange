@@ -14,5 +14,4 @@ public class ScoreEntry
 }
 
 public record PlayerDto(Guid token, string name);
-public record RenameRequest(string name);
 public record PlayerScoreDto(string name, int wins, int loses, int ties, int total);

@@ -23,17 +23,6 @@ public class PlayersController : ControllerBase
         return Ok(dto);
     }
 
-    //[HttpPost("rename")]
-    //public IActionResult Rename([FromBody] RenameRequest req)
-    //{
-    //    if (!Request.Headers.TryGetValue("X-Player-Token", out var headerVals) || !Guid.TryParse(headerVals.FirstOrDefault(), out var token))
-    //        return Unauthorized(new { message = "missing token" });
-
-    //    if (_players.Rename(token, req.name, out var updated))
-    //        return Ok(updated);
-    //    return NotFound(new { message = "Player not found" });
-    //}
-
     [HttpGet("scores")]
     public IActionResult GetPlayerScores()
     {

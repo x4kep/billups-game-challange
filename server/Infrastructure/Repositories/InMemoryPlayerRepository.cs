@@ -26,13 +26,4 @@ public class InMemoryPlayerRepository : IPlayerRepository
 
     public IEnumerable<Player> GetAll() => _byToken.Values.ToArray();
 
-    public bool Rename(int id, string newName)
-    {
-        newName = (newName ?? string.Empty).Trim();
-        if (string.IsNullOrWhiteSpace(newName)) return false;
-        var player = _byToken.Values.FirstOrDefault(p => p.Id == id);
-        if (player == null) return false;
-        player.Name = newName;
-        return true;
-    }
 }
