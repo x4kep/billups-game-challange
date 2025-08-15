@@ -103,6 +103,7 @@ This workflow is triggered when code is pushed to the **main** branch in the **c
 - Builds the client Docker image (Dockerfile is provided in the client project).
 - Pushes the image to AWS ECR.
 - Triggers AWS App Runner deployment (automatic update is enabled in this demo).
+- Runs end-to-end tests using Playwright to ensure the client functions correctly before deployment.
 
 **Notes:**
 
