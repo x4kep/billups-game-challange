@@ -1,4 +1,6 @@
 using server.Services;
+using server.Core.Repositories;
+using server.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,10 @@ builder.Services.AddHttpClient("random");
 builder.Services.AddSingleton<IGameService, GameService>();
 builder.Services.AddSingleton<IScoreboard, Scoreboard>();
 
+builder.Services.AddSingleton<IPlayerRegistry, PlayerRegistry>();
+builder.Services.AddSingleton<IPlayerRepository, InMemoryPlayerRepository>();
+builder.Services.AddSingleton<IRoundRepository, InMemoryRoundRepository>();
+
 var app = builder.Build();
 
 
@@ -41,7 +47,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseCors();
-
+app.UsePlayerTokenAuth();
 app.MapControllers();
 
 app.Run();

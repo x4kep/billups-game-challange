@@ -16,3 +16,11 @@ export type Score = {
   computer: number;
   results: PlayResult["results"];
 };
+
+export type PlayerScore = {
+  name: string;
+  wins: number;
+  loses: number;
+  ties: number;
+  total: number;
+};

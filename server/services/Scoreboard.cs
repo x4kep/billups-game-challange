@@ -33,4 +33,23 @@ public class Scoreboard : IScoreboard
             _scores.Clear();
         }
     }
+    public IEnumerable<PlayerScoreDto> GetPlayerScores()
+    {
+        lock (_gate)
+        {
+            var groups = _scores
+                .GroupBy(s => s.user)
+                .Select(g => new PlayerScoreDto(
+                    name: g.LastOrDefault()?.user ?? "guest",
+                    wins: g.Count(x => x.results == "win"),
+                    loses: g.Count(x => x.results == "lose"),
+                    ties: g.Count(x => x.results == "tie"),
+                    total: g.Count()
+                ))
+                .OrderByDescending(p => p.wins)
+                .ThenBy(p => p.name)
+                .ToArray();
+            return groups;
+        }
+    }
 }
