@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import "./PlayerScoresTable.css";
 import type { PlayerScore } from "../../services/types/types";
 
