@@ -15,9 +15,9 @@
 
 .score-table__header,
 .score-table__cell {
-    padding: 8px;
+    padding: 5px;
     border-bottom: 1px solid var(--color-gray-300);
-    height: 24px;
+    height: 40px;
     width: 100px;
 }
 
@@ -43,4 +43,13 @@
 .score-table__cell--tie {
     color: var(--color-warning);
     font-weight: bold;
+}
+
+@media (max-width: 768px) {
+
+    .score-table__header,
+    .score-table__cell {
+        font-size: 10px;
+        height: 30px;
+    }
 }

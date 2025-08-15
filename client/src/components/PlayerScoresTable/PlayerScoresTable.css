@@ -47,3 +47,13 @@
     color: var(--color-warning);
     font-weight: bold;
 }
+
+@media (max-width: 768px) {
+
+    .player-scores-table__header,
+    .player-scores-table__cell {
+        height: 30px;
+        padding: 5px;
+        font-size: 10px;
+    }
+}
