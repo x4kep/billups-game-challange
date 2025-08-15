@@ -19,3 +19,16 @@
     font-weight: bold;
     color: #2a6df4;
 }
+
+/* Mobile adjustments */
+@media (max-width: 700px) {
+    .current-user {
+        width: 100%;
+        font-size: 28px;
+    }
+
+    .current-user__label,
+    .current-user__name {
+        font-size: 28px;
+    }
+}
