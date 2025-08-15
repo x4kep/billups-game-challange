@@ -54,6 +54,8 @@ jobs:
           context: ./client
           file: ./client/Dockerfile
           push: true
+          progress: plain 
+          pull: true
           tags: |
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
