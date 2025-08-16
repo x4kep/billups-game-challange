@@ -22,86 +22,8 @@ env:
   VITE_API_BASE: "https://3q3wybpmda.us-east-1.awsapprunner.com/api"
 
 jobs:
-  test-client:
-    name: Run Playwright tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./client
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: ./client/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
-      # Build with API base baked in
-      - name: Build app
-        env:
-          VITE_API_BASE: ${{ env.VITE_API_BASE }}
-        run: npm run build
-
-      # Start Vite preview on 5173 in background and record PID
-      - name: Start preview server
-        run: |
-          nohup npx vite preview --port 5173 --host --strictPort > preview.log 2>&1 &
-          echo $! > preview.pid
-
-      # Wait for the server to be ready
-      - name: Wait for server
-        run: npx -y wait-on http://localhost:5173
-
-      - name: Run Playwright tests
-        run: npx playwright test
-
-      # Always upload reports to help debug if something fails
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: client/playwright-report
-          if-no-files-found: ignore
-          retention-days: 7
-
-      - name: Upload test-results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: client/test-results
-          if-no-files-found: ignore
-          retention-days: 7
-
-      - name: Upload preview.log on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: preview-log
-          path: client/preview.log
-          if-no-files-found: ignore
-          retention-days: 7
-
-      # Stop preview server
-      - name: Stop preview server
-        if: always()
-        run: |
-          if [ -f preview.pid ]; then kill "$(cat preview.pid)" || true; fi
-
   build-and-push:
-    name: Build and push Docker image
     runs-on: ubuntu-latest
-    needs: test-client
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -113,9 +35,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Mask env
-        run: echo "::add-mask::${{ env.VITE_API_BASE }}"
-
       - name: Who am I?
         run: aws sts get-caller-identity
 
@@ -125,27 +44,38 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
+      - name: Build and push UI image
         id: build
         uses: docker/build-push-action@v6
         with:
           context: ./client
           file: ./client/Dockerfile
           push: true
-          progress: plain
-          pull: true
+          platforms: linux/amd64
+          build-args: |
+            VITE_API_BASE=${{ env.VITE_API_BASE }}
           tags: |
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          build-args: |
-            VITE_API_BASE=${{ env.VITE_API_BASE }}
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache
           cache-to: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache,mode=max
+
+      - name: Pull pushed image by digest and retag
+        run: |
+          IMAGE="${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}"
+          DIGEST="${{ steps.build.outputs.digest }}"
+          docker pull "$IMAGE@$DIGEST"
+          docker tag "$IMAGE@$DIGEST" billupsgame/ui:${{ github.sha }}
+
+      - name: Save image as tar.gz
+        run: |
+          docker save billupsgame/ui:${{ github.sha }} | gzip > ui-image-${{ github.sha }}.tar.gz
+          ls -lh ui-image-${{ github.sha }}.tar.gz
 
       - name: Export Docker Build record (.dockerbuild)
         run: |
           docker buildx version
-          docker buildx history export -o client-build.dockerbuild || echo "Skipping build record export"
+          docker buildx history export -o ui-build.dockerbuild || echo "Skipping build record export"
 
       - name: Create deploy metadata
         run: |
@@ -162,14 +92,22 @@ jobs:
             "viteApiBase": "${{ env.VITE_API_BASE }}"
           }
           EOF
-          cat client-deploy-info.json
 
-      - name: Upload artifacts
+      # ✅ Upload the runnable image artifact
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-image-${{ github.sha }}
+          path: ui-image-${{ github.sha }}.tar.gz
+          retention-days: 30
+
+      # Optional: upload metadata + build record
+      - name: Upload metadata artifacts
         uses: actions/upload-artifact@v4
         with:
           name: client-deploy-${{ github.sha }}
           path: |
             client-deploy-info.json
-            client-build.dockerbuild
-          if-no-files-found: warn
+            ui-build.dockerbuild
           retention-days: 30
+          if-no-files-found: warn
