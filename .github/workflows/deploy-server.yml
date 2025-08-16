@@ -16,18 +16,17 @@ permissions:
   id-token: write
 
 env:
-  # ECR (your API image repo)
   ECR_REGION: eu-north-1
   ECR_REGISTRY: 790277131841.dkr.ecr.eu-north-1.amazonaws.com
   ECR_REPOSITORY: myapp
 
-  # App Runner (your running API service)
   APP_RUNNER_REGION: us-east-1
   APP_RUNNER_SERVICE_ARN: arn:aws:apprunner:us-east-1:790277131841:service/billups-game-api/cf2113d8a0f6468bbb2c4641e988a34f
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,22 +61,22 @@ jobs:
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache
           cache-to: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache,mode=max
 
-      # Export a runnable image artifact
+      # 🔽 NEW: produce a runnable .tar.gz image artifact
       - name: Pull pushed image by digest and retag locally
         run: |
+          set -e
           IMAGE="${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}"
           DIGEST="${{ steps.build.outputs.digest }}"
           echo "Pulling $IMAGE@$DIGEST"
           docker pull "$IMAGE@$DIGEST"
-          # Tag to a simple local name for saving
           docker tag "$IMAGE@$DIGEST" billupsgame/api:${{ github.sha }}
 
       - name: Save image as tar.gz
         run: |
-          docker save billupsgame/api:${{ github.sha }} | gzip > api-image-${{ github.sha }}.tar.gz
-          ls -lh api-image-${{ github.sha }}.tar.gz
+          docker save billupsgame/api:${{ github.sha }} | gzip > server-image-${{ github.sha }}.tar.gz
+          ls -lh server-image-${{ github.sha }}.tar.gz
 
-      # Artifacts for traceability
+      # Optional: BuildKit record for auditing
       - name: Export Docker Build record (.dockerbuild)
         run: |
           docker buildx version
@@ -104,10 +103,10 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: api-deploy-${{ github.sha }}
+          name: server-deploy-${{ github.sha }}
           path: |
             api-deploy-info.json
             api-build.dockerbuild
-            api-image-${{ github.sha }}.tar.gz
-          if-no-files-found: warn
+            server-image-${{ github.sha }}.tar.gz
           retention-days: 30
+          if-no-files-found: warn
