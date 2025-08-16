@@ -19,14 +19,12 @@ env:
   ECR_REGION: eu-north-1
   ECR_REGISTRY: 790277131841.dkr.ecr.eu-north-1.amazonaws.com
   ECR_REPOSITORY: myapp
-
   APP_RUNNER_REGION: us-east-1
   APP_RUNNER_SERVICE_ARN: arn:aws:apprunner:us-east-1:790277131841:service/billups-game-api/cf2113d8a0f6468bbb2c4641e988a34f
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,13 +59,11 @@ jobs:
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache
           cache-to: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache,mode=max
 
-      # 🔽 NEW: produce a runnable .tar.gz image artifact
       - name: Pull pushed image by digest and retag locally
         run: |
           set -e
           IMAGE="${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}"
           DIGEST="${{ steps.build.outputs.digest }}"
-          echo "Pulling $IMAGE@$DIGEST"
           docker pull "$IMAGE@$DIGEST"
           docker tag "$IMAGE@$DIGEST" billupsgame/api:${{ github.sha }}
 
@@ -76,7 +72,6 @@ jobs:
           docker save billupsgame/api:${{ github.sha }} | gzip > server-image-${{ github.sha }}.tar.gz
           ls -lh server-image-${{ github.sha }}.tar.gz
 
-      # Optional: BuildKit record for auditing
       - name: Export Docker Build record (.dockerbuild)
         run: |
           docker buildx version
@@ -98,15 +93,22 @@ jobs:
             "serviceArn": "${{ env.APP_RUNNER_SERVICE_ARN }}"
           }
           EOF
-          cat api-deploy-info.json
 
-      - name: Upload artifacts
+      # ✅ Upload the runnable image artifact
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-image-${{ github.sha }}
+          path: server-image-${{ github.sha }}.tar.gz
+          retention-days: 30
+
+      # Optional: upload metadata + build record
+      - name: Upload metadata artifacts
         uses: actions/upload-artifact@v4
         with:
           name: server-deploy-${{ github.sha }}
           path: |
             api-deploy-info.json
             api-build.dockerbuild
-            server-image-${{ github.sha }}.tar.gz
           retention-days: 30
           if-no-files-found: warn
