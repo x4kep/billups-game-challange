@@ -55,11 +55,27 @@ jobs:
           context: ./server
           file: ./server/Dockerfile
           push: true
+          platforms: linux/amd64
           tags: |
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
             ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           cache-from: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache
           cache-to: type=registry,ref=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:buildcache,mode=max
+
+      # Export a runnable image artifact
+      - name: Pull pushed image by digest and retag locally
+        run: |
+          IMAGE="${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}"
+          DIGEST="${{ steps.build.outputs.digest }}"
+          echo "Pulling $IMAGE@$DIGEST"
+          docker pull "$IMAGE@$DIGEST"
+          # Tag to a simple local name for saving
+          docker tag "$IMAGE@$DIGEST" billupsgame/api:${{ github.sha }}
+
+      - name: Save image as tar.gz
+        run: |
+          docker save billupsgame/api:${{ github.sha }} | gzip > api-image-${{ github.sha }}.tar.gz
+          ls -lh api-image-${{ github.sha }}.tar.gz
 
       # Artifacts for traceability
       - name: Export Docker Build record (.dockerbuild)
@@ -92,5 +108,6 @@ jobs:
           path: |
             api-deploy-info.json
             api-build.dockerbuild
+            api-image-${{ github.sha }}.tar.gz
           if-no-files-found: warn
           retention-days: 30
